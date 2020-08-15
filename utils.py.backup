@@ -1,0 +1,108 @@
+import argparse
+import configparser
+import requests
+import json
+import os
+import tempfile
+from pathlib import Path
+
+
+class NullDict(object):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __len__(self):
+        return len(self.value)
+
+    def __iter__(self):
+        return map(NullDict, self.value)
+
+    def __getattr__(self, name):
+        return self[name]
+
+    def __getitem__(self, key):
+        try:
+            return NullDict(self.value[key])
+        except:
+            return NullDict(None)
+
+    def __str__(self):
+        return str(self.value)
+
+    def __format__(self, spec):
+        if self.value is None:
+            return "".__format__(spec)
+        return self.value.__format__(spec)
+
+    def toJSON(self):
+        return json.dumps(self.value)
+
+
+class JiraClient(object):
+
+    def __init__(self, config):
+        self.config = config
+
+    def get(self, req, **kwargs):
+        url = self.config['rest']['url'] + '/rest/api/latest/' + req
+        auth = (self.config['rest']['username'], self.config['rest']['password'])
+        response = requests.get(url, auth=auth, **kwargs)
+        return NullDict(response.json())
+
+    def post(self, req, **kwargs):
+        url = self.config['rest']['url'] + '/rest/api/latest/' + req
+        auth = (self.config['rest']['username'], self.config['rest']['password'])
+        response = requests.post(url, auth=auth, **kwargs)
+        return NullDict(response.json())
+
+
+def not_implemented():
+    print("Not yet implemented")
+
+
+def try_to_read_config():
+    config_file = Path(Path.home(), '.jirarc')
+    if not config_file.is_file():
+        raise IOError(f"Cannot find configuration file {config_file}", "Run jira init first")
+
+    config = configparser.ConfigParser()
+    try:
+        config.read(config_file)
+    except:
+        raise IOError("Cannot read configuration file {config_file}")
+
+    return config
+
+
+def read_config():
+    try:
+        return try_to_read_config()
+    except IOError as ex:
+        for msg in ex.args:
+            print(msg)
+        exit(1)
+
+
+def from_editor(action, initial):
+    if "EDITOR" not in os.environ:
+        print(f"Environment variable EDITOR is not defined. Cannot run an editor to {action}.")
+        exit(1)
+
+    tf = tempfile.NamedTemporaryFile(suffix=".tmp", delete=False)
+    with tf as f:
+        f.write(_initial.encode('utf-8'))
+
+    call([os.environ["EDITOR"], f.name])
+
+    with open(tf.name, 'r') as f:
+        edited = f.read()
+
+    try:
+        os.unlink(tf.name)
+    except:
+        pass
+
+    return list(filter(lambda l: not l.startswith('#'), edited.split(os.linesep)))
+
+
