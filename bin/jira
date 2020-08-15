@@ -1,0 +1,6 @@
+#!/bin/zsh
+
+cd $0(:A:h:h)
+PYTHONPATH=src:$PYTHONPATH
+source env/bin/activate
+python src/main.py $*

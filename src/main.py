@@ -21,7 +21,7 @@ def build_parser():
         parser = module.parser(build)
         parser.set_defaults(func=module.execute)
 
-    module_files = glob.glob(dirname(__file__) + "command/*.py")
+    module_files = glob.glob(dirname(__file__) + "/command/*.py")
     module_names = ['command.' + basename(f)[:-3] for f in module_files if isfile(f) and not f.endswith('__init__.py')]
 
     for module_name in module_names:

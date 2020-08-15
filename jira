@@ -1,5 +1,0 @@
-#!/bin/zsh
-
-cd $0(:A:h)
-source env/bin/activate
-python main.py $*
