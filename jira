@@ -1,4 +1,5 @@
 #!/bin/zsh
 
 cd $0(:A:h)
-~/miniconda3/envs/py3/bin/python main.py $*
+source env/bin/activate
+python main.py $*
