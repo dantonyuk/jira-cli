@@ -6,7 +6,7 @@ from importlib import import_module
 from rest import enable_debug
 
 
-def parse_args():
+def build_parser():
     parser = argparse.ArgumentParser(description="Jira CLI")
     parser.add_argument('-d', '--debug', type=bool, default=False, help='Enable debug mode')
     subparsers = parser.add_subparsers(title='commands', dest='command')
@@ -27,11 +27,18 @@ def parse_args():
     for module_name in module_names:
         add_parser(module_name)
 
-    return parser.parse_args()
+    return parser
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if args.command is None:
+        parser.print_help()
+        parser.exit()
+
     if args.debug:
         enable_debug()
+
     args.func(**vars(args))
