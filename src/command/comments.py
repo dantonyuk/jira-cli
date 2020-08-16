@@ -1,4 +1,4 @@
-from utils import *
+from jira import jira_client
 
 
 def parser(build):
@@ -8,11 +8,10 @@ def parser(build):
 
 
 def execute(issue, *args, **kwargs):
-    config = read_config()
-    client = JiraClient(config)
-    json = client.get('issue/' + issue + '/comment')
+    client = jira_client()
+    json = client.rest.get('issue/' + issue + '/comment').result
     for comment in json['comments']:
         print("\n{} {}\n{}".format(
-            comment.created, 
-            comment.author.name, 
+            comment.created,
+            comment.author.name,
             comment.body))
