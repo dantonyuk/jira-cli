@@ -7,7 +7,7 @@ Simple Jira CLI client.
 Clone the repository
 
 ```bash
-git clone https://github.com/dmitry-at-hyla/jira-cli.git
+git clone https://github.com/dantonyuk/jira-cli.git
 ```
 
 Set up virtual environment
